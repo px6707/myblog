@@ -2,15 +2,15 @@ import I18nKeys from "./src/locales/keys";
 import type { Configuration } from "./src/types/config";
 
 const YukinaConfig: Configuration = {
-  title: "Yukina",
-  subTitle: "Yukina Template Demo Site",
-  brandTitle: "Yukina",
+  title: "小小小同学",
+  subTitle: "小小小同学的地盘",
+  brandTitle: "小小小同学",
 
-  description: "Demo Site",
+  description: "小小小同学的个人博客",
 
   site: "https://yukina-blog.vercel.app",
 
-  locale: "en", // set for website language and date format
+  locale: "zh-CN", // set for website language and date format
 
   navigators: [
     {
@@ -27,11 +27,11 @@ const YukinaConfig: Configuration = {
     },
     {
       nameKey: I18nKeys.nav_bar_github,
-      href: "https://github.com/WhitePaper233/yukina",
+      href: "https://github.com/px6707",
     },
   ],
 
-  username: "WhitePaper 白芷",
+  username: "小小小同学",
   sign: "Ad Astra Per Aspera.",
   avatarUrl: "https://s2.loli.net/2025/01/25/FPpTrQSezM8ivbl.webp",
   socialLinks: [

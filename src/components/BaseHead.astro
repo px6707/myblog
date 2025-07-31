@@ -2,7 +2,7 @@
 import YukinaConfig from "../../yukina.config";
 import GlobalStyles from "./GlobalStyles.astro";
 import ScriptSetup from "./ScriptSetup.astro";
-
+import "../styles/katex.min.css"
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -45,11 +45,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <!-- SiteMap -->
 <link rel="sitemap" href="/sitemap-index.xml" />
 
-<!-- CSS -->
-<link
-  rel="stylesheet"
-  href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
-/>
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.bunny.net" />
 <link

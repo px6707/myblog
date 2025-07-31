@@ -5,7 +5,6 @@
 
   import I18nKeys from "../locales/keys";
   import { i18n } from "../locales/translation";
-
   let searchKeyword = "";
   let searchResult: any[] = [];
 
