@@ -54,14 +54,14 @@ const YukinaConfig: Configuration = {
   maxFooterTagChip: 24,
 
   banners: [
-    "public/v2-0aea793a695f0368c8884b02cac48f3d_1440w.jpg",
-    "public/v2-2b0bf97be6df11a2fa7711c30cfe571a_1440w.jpg",
-    "public/v2-e81c476f5a7f2172a050e3784add56f3_1440w.jpg",
-    "public/v2-86a32bcbcfe9c1341e26763d27aae982_1440w.jpg",
+    "v2-0aea793a695f0368c8884b02cac48f3d_1440w.jpg",
+    "v2-2b0bf97be6df11a2fa7711c30cfe571a_1440w.jpg",
+    "v2-e81c476f5a7f2172a050e3784add56f3_1440w.jpg",
+    "v2-86a32bcbcfe9c1341e26763d27aae982_1440w.jpg",
     "v2-892ef73b0a3ac37142139f0b5e93db34_1440w.webp",
     "v2-bd320272216ae716984467cb0d734826_1440w.jpg",
     "v2-d0c13ddc24a2abfbabdcfac8e5051bdc_1440w.png",
-    "public/suolong5.webp",
+    "suolong5.webp",
   ],
 
   slugMode: "HASH", // 'RAW' | 'HASH'
