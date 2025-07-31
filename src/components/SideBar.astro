@@ -29,7 +29,7 @@ const tagKeys = [...tags.keys()];
       <div class="username mt-4">
         <p>{YukinaConfig.username}</p>
       </div>
-      <p class="slogan mt-2 text-center text-[var(--text-color-lighten)]">
+      <p class="slogan mt-2 text-center text-[var(--text-color-lighten)] break-words whitespace-pre-line">
         {YukinaConfig.sign}
       </p>
       {
@@ -145,6 +145,7 @@ const tagKeys = [...tags.keys()];
   }
 
   .avatar {
+    object-fit: cover;
     @apply h-56 w-56 rounded-xl transition-all hover:cursor-pointer;
   }
 
