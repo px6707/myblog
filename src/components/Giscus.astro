@@ -1,0 +1,58 @@
+---
+interface Props {
+  theme?: 'light' | 'dark' | 'preferred_color_scheme';
+  mapping?: 'url' | 'pathname' | 'title';
+  reactionsEnabled?: boolean;
+  inputPosition?: 'top' | 'bottom';
+}
+const {
+  theme = 'preferred_color_scheme',
+  mapping = 'pathname',
+  reactionsEnabled = true,
+  inputPosition = 'top',
+} = Astro.props;
+---
+
+<div id="giscus-container" class="mt-8"></div>
+
+<script define:vars={{ theme, mapping, reactionsEnabled, inputPosition }}>
+  // 这个脚本会在客户端执行，创建并添加Giscus评论系统
+  const customTheme = theme
+  const theme = localStorage.getItem("theme") || customTheme
+
+  function loadGiscus() {
+    const script = document.createElement("script");
+    const container = document.querySelector("#giscus-container");
+    
+    // 请替换以下配置为您自己的Giscus配置
+    // 您需要从 https://giscus.app 获取这些值
+    Object.entries({
+      src: "https://giscus.app/client.js",
+      "data-repo": "px6707/myblog", // 替换为您的仓库名称
+      "data-repo-id": "R_kgDOPV4KZw", // 替换为您的仓库ID
+      "data-category": "Announcements", // 替换为您的讨论分类
+      "data-category-id": "DIC_kwDOPV4KZ84Ct11F", // 替换为您的分类ID
+      "data-mapping": mapping,
+      "data-strict": "0",
+      "data-reactions-enabled": reactionsEnabled ? "1" : "0",
+      "data-emit-metadata": "0",
+      "data-input-position": inputPosition,
+      "data-theme": theme,
+      "data-lang": "zh-CN", // 设置为中文
+      // "data-loading": "lazy",
+      crossorigin: "anonymous",
+    }).forEach(([key, value]) => {
+      script.setAttribute(key, value);
+    });
+    
+    script.setAttribute("async", "true");
+    container?.appendChild(script);
+  }
+
+  // 当页面加载完成后加载Giscus
+  if (document.readyState === 'complete') {
+    loadGiscus();
+  } else {
+    window.addEventListener('load', loadGiscus);
+  }
+</script>

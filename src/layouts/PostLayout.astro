@@ -2,6 +2,7 @@
 import Main from "../layouts/MainLayout.astro";
 import Markdown from "../components/Markdown.astro";
 import CopyRight from "../components/misc/CopyRight.astro";
+import Giscus from "../components/Giscus.astro";
 
 interface Props {
   title?: string;
@@ -45,6 +46,10 @@ const {
           />
         )
       }
+      <div class="comments-container mt-8">
+        <h2 class="text-2xl font-bold mb-4">评论</h2>
+        <Giscus />
+      </div>
     </div>
   </div>
 </Main>
