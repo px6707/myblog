@@ -7,6 +7,103 @@ import BaseHead from "../components/BaseHead.astro";
   <BaseHead />
   <body class="overflow-y-hidden">
     <slot />
+    <script>
+      import confetti from "canvas-confetti";
+
+      let skew = 1;
+
+      function randomInRange(min: number, max: number) {
+        return Math.random() * (max - min) + min;
+      }
+
+      // 定义好看的雪花颜色
+      const lightThemeColors = [
+        '#88C0D0', // 淡蓝色
+        '#B48EAD', // 淡紫色
+        '#A3BE8C', // 淡绿色
+        '#EBCB8B', // 淡黄色
+        '#D08770', // 淡橙色
+        '#5E81AC', // 深蓝色
+        '#BF616A'  // 淡红色
+      ];
+      
+      const darkThemeColors = [
+        '#81A1C1', // 亮蓝色
+        '#B48EAD', // 亮紫色
+        '#A3BE8C', // 亮绿色
+        '#EBCB8B', // 亮黄色
+        '#D08770', // 亮橙色
+        '#88C0D0', // 天蓝色
+        '#BF616A'  // 亮红色
+      ];
+
+      (function frame() {
+        let currentTheme = localStorage.getItem("theme") || "light";
+        skew = Math.max(0.8, skew - 0.001);
+
+        // 根据当前主题选择颜色
+        const colors = currentTheme === "dark" ? darkThemeColors : lightThemeColors;
+        // 随机选择一种颜色
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+        confetti({
+          particleCount: 5,
+          startVelocity: 0,
+          ticks: 200,
+          origin: {
+            x: Math.random(),
+            // since particles fall down, skew start toward the top
+            y: (Math.random() * skew) - 0.2
+          },
+          colors: [randomColor], // 使用随机选择的颜色
+          shapes: ['circle'],
+          gravity: randomInRange(0.4, 0.6),
+          scalar: randomInRange(0.4, 1),
+          drift: randomInRange(-0.4, 0.4)
+        });
+
+        requestAnimationFrame(frame);
+      }());
+
+      document.addEventListener('click', function(e) {
+        let currentTheme = localStorage.getItem("theme") || "light";
+        // 根据当前主题选择颜色
+        const colors = currentTheme === "dark" ? darkThemeColors : lightThemeColors;
+        // 创建真正的360度圆形爆炸效果
+        const explosionRadius = 10; // 控制爆炸半径的参数，值越大半径越大
+        const defaults = {
+          origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+          ticks: 50,
+          gravity: 1, // 移除重力效果，使粒子不会向下掉落
+          decay: 0.94,
+          startVelocity: explosionRadius,
+          shapes: ['circle', 'square', 'star'],
+          colors: colors
+        };
+
+        // 创建多个角度的爆炸，覆盖360度
+        for (let angle = 0; angle < 360; angle += 15) {
+          confetti({
+            ...defaults,
+            angle: angle, // 设置角度
+            particleCount: 5, // 每个角度发射的粒子数
+            flat: true, // 使粒子保持在同一平面
+            scalar: 1, // 粒子大小
+            drift: 0, // 防止粒子漂移
+            spread: 10 // 小扩散角度，保持方向性
+          });
+        }
+        
+        // 添加一些随机粒子增加效果的丰富性
+        confetti({
+          ...defaults,
+          particleCount: 40,
+          scalar: 1,
+          spread: 360, // 完全随机的方向
+          disableForReducedMotion: true
+        });
+      });
+    </script>
   </body>
 </html>
 

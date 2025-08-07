@@ -5,7 +5,7 @@ import I18nKeys from "../locales/keys";
 import { i18n } from "../locales/translation";
 import { GetCategories, GetTags } from "../utils/content";
 import SocialIcon from "./widgets/SocialIcon.astro";
-
+import Calendar from "./Calendar.astro";
 const tags = await GetTags();
 const categories = await GetCategories();
 
@@ -44,7 +44,7 @@ const tagKeys = [...tags.keys()];
         )
       }
     </div>
-
+    <Calendar />
     <!-- categories -->
     {
       categories.size !== 0 && (
