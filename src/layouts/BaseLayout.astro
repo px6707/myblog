@@ -47,7 +47,7 @@ import BaseHead from "../components/BaseHead.astro";
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
         confetti({
-          particleCount: 5,
+          particleCount: 1,
           startVelocity: 0,
           ticks: 200,
           origin: {
@@ -86,7 +86,7 @@ import BaseHead from "../components/BaseHead.astro";
           confetti({
             ...defaults,
             angle: angle, // 设置角度
-            particleCount: 5, // 每个角度发射的粒子数
+            particleCount: 1, // 每个角度发射的粒子数
             flat: true, // 使粒子保持在同一平面
             scalar: 1, // 粒子大小
             drift: 0, // 防止粒子漂移
