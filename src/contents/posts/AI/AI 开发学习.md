@@ -101,9 +101,9 @@ draft: false
 
 | 资源 | 类型 | 语言 | 质量 | 链接 |
 |------|------|------|------|------|
-| OpenAI API 官方文档 | 文档 | 中文 | ⭐⭐⭐⭐⭐ | https://platform.openai.com/docs/introduction |
-| 大模型基础概念讲解 | 视频 | 中文 | ⭐⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Xs4y1T7Gq |
-| LLM 入门指南 | 文章 | 中文 | ⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/620990477 |
+| OpenAI API 官方文档 | 文档 | 英文 | ⭐⭐⭐⭐⭐ | https://platform.openai.com/docs/introduction |
+| 大模型基础概念入门 | 视频 | 中文 | ⭐⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1bx4y1Q7rX |
+| 大语言模型原理与应用 | 文章 | 中文 | ⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/597586623 |
 
 #### 2. API 调用实战
 
@@ -207,7 +207,7 @@ for chunk in stream:
 | LangChain 中文入门教程 | 教程 | 中文 | ⭐⭐⭐⭐⭐ | https://github.com/liaokongVFX/LangChain-Chinese-Getting-Started-Guide |
 | LangChain 官方文档 | 文档 | 英文 | ⭐⭐⭐⭐⭐ | https://python.langchain.com/docs/get_started/introduction |
 | LangChain 中文文档 | 文档 | 中文 | ⭐⭐⭐⭐ | https://python.langchain.com.cn/ |
-| LangChain 实战课 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Qu4y1h7gx |
+| LangChain 实战教程 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1sN4y1J7bP |
 
 #### 2. Prompt Template
 
@@ -294,7 +294,7 @@ result = agent_executor.invoke({
 | 资源 | 类型 | 语言 | 质量 | 链接 |
 |------|------|------|------|------|
 | LangChain Agent 教程 | 教程 | 中文 | ⭐⭐⭐⭐⭐ | https://python.langchain.com.cn/docs/modules/agents/ |
-| Agent 开发实战 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Qu411h7gx |
+| LangChain Agent 开发 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1TM4y1W7TT |
 | LangChain Cookbook | 示例 | 英文 | ⭐⭐⭐⭐⭐ | https://github.com/langchain-ai/langchain/tree/master/cookbook |
 
 #### 6. Memory 管理
@@ -361,8 +361,8 @@ agent_executor = AgentExecutor(
 | 提示工程指南（中文） | 文档 | 中文 | ⭐⭐⭐⭐⭐ | https://www.promptingguide.ai/zh |
 | LangGPT 结构化提示词 | 教程 | 中文 | ⭐⭐⭐⭐⭐ | https://github.com/yzfly/LangGPT |
 | 吴恩达 Prompt Engineering 课程 | 视频 | 中文字幕 | ⭐⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Bo4y1A7FU |
-| OpenAI Prompt 最佳实践 | 文档 | 中文 | ⭐⭐⭐⭐⭐ | https://platform.openai.com/docs/guides/prompt-engineering |
-| Prompt 技巧大全 | 文章 | 中文 | ⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/620990477 |
+| OpenAI Prompt 最佳实践 | 文档 | 英文 | ⭐⭐⭐⭐⭐ | https://platform.openai.com/docs/guides/prompt-engineering |
+| Prompt 提示词技巧 | 文章 | 中文 | ⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/632369186 |
 
 #### 2. 基础提示技巧
 
@@ -484,7 +484,7 @@ Final Answer: 最终答案
 |------|------|------|------|------|
 | Chain-of-Thought 论文解读 | 文章 | 中文 | ⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/589087074 |
 | ReAct 提示技巧 | 教程 | 中文 | ⭐⭐⭐⭐ | https://www.promptingguide.ai/zh/techniques/react |
-| 结构化提示词设计 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Xs4y1T7Gq |
+| Prompt Engineering 实战 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1No4y1t7Zn |
 
 ### 实战练习
 
@@ -534,7 +534,7 @@ Final Answer: 最终答案
 | RAG 从入门到精通 | 教程 | 中文 | ⭐⭐⭐⭐⭐ | https://github.com/NirDiamant/RAG_Techniques |
 | RAG 原理详解 | 文章 | 中文 | ⭐⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/647392838 |
 | LangChain RAG 教程 | 教程 | 中文 | ⭐⭐⭐⭐ | https://python.langchain.com.cn/docs/use_cases/question_answering/ |
-| RAG 实战视频 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Qu4y1h7gx |
+| RAG 检索增强生成实战 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1w8411B7jK |
 
 #### 2. 向量数据库
 
@@ -589,8 +589,8 @@ results = vectorstore.similarity_search("查询问题", k=3)
 |------|------|------|------|------|
 | Chroma 官方文档 | 文档 | 英文 | ⭐⭐⭐⭐⭐ | https://docs.trychroma.com/ |
 | 向量数据库对比 | 文章 | 中文 | ⭐⭐⭐⭐ | https://zhuanlan.zhihu.com/p/647392838 |
-| Embedding 原理 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Xs4y1T7Gq |
-| Qdrant 中文教程 | 教程 | 中文 | ⭐⭐⭐⭐ | https://qdrant.tech/documentation/ |
+| 向量数据库与 Embedding | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Qu4y1h7gx |
+| Qdrant 官方文档 | 文档 | 英文 | ⭐⭐⭐⭐ | https://qdrant.tech/documentation/ |
 
 #### 3. 构建 RAG 系统
 
@@ -904,7 +904,7 @@ async def chat(request: ChatRequest):
 | 资源 | 类型 | 语言 | 质量 | 链接 |
 |------|------|------|------|------|
 | FastAPI 中文教程 | 文档 | 中文 | ⭐⭐⭐⭐⭐ | https://fastapi.tiangolo.com/zh/ |
-| FastAPI 实战 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Qu4y1h7gx |
+| FastAPI 快速入门 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1NL411N7vQ |
 
 #### 2. Docker 容器化
 
@@ -944,7 +944,7 @@ services:
 | 资源 | 类型 | 语言 | 质量 | 链接 |
 |------|------|------|------|------|
 | Docker 从入门到实践 | 书籍 | 中文 | ⭐⭐⭐⭐⭐ | https://yeasy.gitbook.io/docker_practice/ |
-| Docker 快速入门 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1Qu4y1h7gx |
+| Docker 入门教程 | 视频 | 中文 | ⭐⭐⭐⭐ | https://www.bilibili.com/video/BV1s54y1n7Ev |
 
 #### 3. 性能优化
 
