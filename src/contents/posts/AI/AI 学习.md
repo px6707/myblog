@@ -1,5 +1,6 @@
 ---
 title: AI 学习
+published: 2026-01-27
 description: AI 学习
 tags: [AI]
 category: AI
