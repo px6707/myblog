@@ -2,8 +2,8 @@
 title: 大模型微调与 RAG
 published: 2026-01-27
 description: 大模型微调与 RAG
-tags: [AI]
-category: 微调
+tags: [AI微调]
+category: AI
 licenseName: "Unlicensed"
 author: panxiao
 sourceLink: "https://github.com/px6707/myblog"

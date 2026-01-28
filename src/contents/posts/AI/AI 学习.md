@@ -2,7 +2,7 @@
 title: AI 学习
 published: 2026-01-27
 description: AI 学习
-tags: [AI]
+tags: [AI开发]
 category: AI
 licenseName: "Unlicensed"
 author: panxiao

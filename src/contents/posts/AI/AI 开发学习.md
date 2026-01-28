@@ -2,7 +2,7 @@
 title: 企业 AI 开发学习
 published: 2025-01-27
 description: AI 学习
-tags: [AI]
+tags: [AI开发]
 category: AI
 licenseName: "Unlicensed"
 author: panxiao
