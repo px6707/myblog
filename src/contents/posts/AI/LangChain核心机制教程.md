@@ -25,7 +25,9 @@ draft: false
 
 ## 一、Runnable：统一执行协议
 
-`Runnable` 把输入转换成输出，常用方法如下：
+**`Runnable`** 是 LangChain Core 里的统一执行抽象：任意「接收输入 → 产生输出」的单元（提示词、模型、解析器、普通函数包装等）都实现同一套接口，因而可以用 `|` 串成链，并用同一组方法调用。
+
+常用方法如下：
 
 | 方法 | 含义 |
 | --- | --- |
@@ -36,6 +38,8 @@ draft: false
 注意：**有 `stream()` 方法不代表每一步都会实时吐出 token**。如果链中某一步不能对上游的输出块做流式转换，后续输出要等那一步完成才开始。`RunnableLambda` 默认就是这种可能阻断逐块传递的步骤。参见 [Runnable](https://reference.langchain.com/python/langchain-core/runnables/base/Runnable) 与 [RunnableSequence](https://reference.langchain.com/python/langchain-core/runnables/base/RunnableSequence)。
 
 ### 1.1 `RunnableLambda` 与顺序组合
+
+**`RunnableLambda`** 把普通 Python 函数（或 `lambda`）包成一个 `Runnable`，使其也能 `invoke` / `batch` / `|` 组合。它本身不调用模型，只做你写的那段同步变换；默认按「整段输入 → 整段输出」工作，一般不会把上游的 token 流逐块往下传。
 
 以下示例不需要模型或 API Key：
 
@@ -50,7 +54,7 @@ assert chain.invoke(4) == 25
 assert chain.batch([1, 2, 3]) == [4, 9, 16]
 ```
 
-`|` 创建的是顺序执行链：上一段的输出成为下一段的输入。`RunnableLambda` 很适合普通函数适配；若要**边接收上游块、边输出下游块**，使用 `RunnableGenerator` 或实现 `transform`。
+`|` 创建的是顺序执行链：上一段的输出成为下一段的输入。`RunnableLambda` 很适合把已有函数接进 LCEL；若要**边接收上游块、边输出下游块**，使用 `RunnableGenerator` 或实现 `transform`。
 
 ### 1.2 `RunnableParallel`：同一输入分发给多个分支
 
@@ -125,16 +129,18 @@ assert ordered == inputs
 
 ## 三、Agent 中间件生命周期
 
-以下钩子属于 **LangChain `create_agent` 的中间件**，不是所有 Runnable 链都会自动触发。根据当前[自定义中间件文档](https://docs.langchain.com/oss/python/langchain/middleware/custom)：
+以下钩子属于 **LangChain `create_agent` 的中间件**，不是所有 Runnable 链都会自动触发。根据当前[自定义中间件文档](https://docs.langchain.com/oss/python/langchain/middleware/custom)与官方对中间件场景的说明：
 
-| 钩子 | 触发时机 | 常见用途 |
+| 钩子 | 触发时机 | 典型场景 |
 | --- | --- | --- |
-| `before_agent` | 一次 Agent 调用开始前 | 初始化本次调用的状态、审计上下文 |
-| `before_model` | 每次模型调用前 | 修剪上下文、预算检查、输入校验 |
-| `after_model` | 每次模型响应后 | 检查完整响应、记录用量 |
-| `after_agent` | 一次 Agent 正常完成后 | 最终结果处理 |
-| `wrap_model_call` | 包住每次模型调用 | 重试、降级、缓存、动态模型选择 |
-| `wrap_tool_call` | 包住每次工具调用 | 工具权限门控、超时、结果处理 |
+| `before_agent` | 一次 Agent 调用开始前（整次 invocation 只一次） | 加载长期记忆 / 用户画像；校验首包输入；初始化本次会话资源（如官方 Shell 中间件在进循环前打开 shell）；写入「run 开始」审计 |
+| `before_model` | 每次模型调用前 | 消息过长时摘要或裁剪（如 SummarizationMiddleware）；去 PII；改写 / 注入 system prompt；检查 token 预算；拦截违规输入 |
+| `after_model` | 每次模型响应后、工具执行前 | 输出护栏 / 内容审核；再扫一遍 PII；记录用量；人工审批「是否执行接下来的 tool_calls」（HITL 常落在这里） |
+| `after_agent` | 一次 Agent **正常完成**后（整次只一次） | 落库最终答案；发送完成通知；释放 `before_agent` 中打开的资源 |
+| `wrap_model_call` | 包住每次模型调用 | 超时重试；主模型失败切备用；响应缓存；按用户等级动态换模型或换工具列表；用小模型先筛工具再绑定（如 LLMToolSelector） |
+| `wrap_tool_call` | 包住每次工具调用 | 权限门控（谁能发邮件）；参数校验；超时与限流；幂等 / 防重；截断或改写超长工具结果；记审计日志 |
+
+粗分：`before_*` / `after_*` 偏「前后钩子改状态或做检查」；`wrap_*` 偏「包一层，决定要不要真正调用、失败怎么兜底」。
 
 几点容易混淆：
 
@@ -232,16 +238,201 @@ print("结果：", finished["status"])
 
 ### 4.2 前后端如何对接
 
-上例展示的是**通用 `interrupt()`**。其中的 `action`、`allowed_decisions` 是本教程自定义的业务数据，**不是** LangChain 内置 `HumanInTheLoopMiddleware` 的固定响应格式。不要把两套格式混用。
+人工审批要拆成「后端跑图 / 存状态」和「前端展示并回传决策」两段。一次典型往返如下：
 
-接口可以设计为：
+```text
+前端 POST /runs
+  → 后端鉴权后生成 run_id、thread_id，invoke 图
+  → 若命中 interrupt：返回 waiting_for_approval + 待审批内容
+  → 若跑完：返回 completed + 结果
 
-1. `POST /runs`：后端从认证上下文确定用户，生成 `run_id` / `thread_id`，调用图并返回 `completed` 或 `waiting_for_approval`、待审批内容。
-2. 前端展示**具体动作、参数和影响范围**，让用户批准或拒绝；不能仅显示“是否继续”。
-3. `POST /runs/{run_id}/decision`：后端验证当前用户是否有权审批该 run，检查其仍处于待审批状态，然后用保存的 `thread_id` 执行 `Command(resume=...)`。
-4. 若网络超时，前端通过 `GET /runs/{run_id}` 查询真实状态；**不要直接再次提交批准**。恢复接口应有幂等或去重策略；检查点只负责保存图状态，不保证外部邮件、数据库写入等副作用恰好执行一次。
+前端展示待审批详情，用户选择批准 / 拒绝
+  → POST /runs/{run_id}/decision
+  → 后端校验权限与「仍待审批」后，用保存的 thread_id 执行 Command(resume=...)
+  → 返回最终结果或下一轮等待
 
-不要直接信任前端传来的 `user_id` 或任意 `thread_id`；它们必须与服务端认证身份和授权关系绑定。原教程的 FastAPI 示例写死了邮件内容、忽略用户输入、用内存字典按用户保存唯一线程，还通过匹配异常字符串识别中断，均不宜照搬。常规 `graph.invoke()` 会在返回值的 `__interrupt__` 暴露中断；若使用 `stream_events(..., version="v3")`，则通过 `stream.interrupted` / `stream.interrupts` 读取，不需要用异常字符串判断。
+网络超时或页面刷新时：GET /runs/{run_id} 查真实状态，不要直接再点一次「批准」
+```
+
+#### 后端：用代码区分「要审批」还是「已完成」
+
+```python
+# 伪代码：API 层把 LangGraph 结果映射成对外 status
+# waiting_for_approval / completed 是你定义的业务字段，不是图内置返回值
+#
+# thread_id 能跨请求恢复，前提是 compile 时挂了 checkpointer：
+#   演示可用 InMemorySaver；生产常用 PostgresSaver 等持久化实现。
+# checkpointer 存图的 checkpoint；save_run 仍要存业务 run 索引（见下）。
+
+from uuid import uuid4
+from langgraph.checkpoint.memory import InMemorySaver  # 或 PostgresSaver
+from langgraph.types import Command
+
+# 模块加载时编译一次；无 checkpointer 则 interrupt 后无法靠 thread_id 恢复
+checkpointer = InMemorySaver()
+graph = builder.compile(checkpointer=checkpointer)
+
+
+def create_run(user, payload):
+    run_id = str(uuid4())
+    thread_id = str(uuid4())
+    # thread_id 是 checkpointer 的检索键：本次 invoke 写入的 checkpoint 挂在这个键下
+    config = {"configurable": {"thread_id": thread_id}}
+
+    # 用户身份只来自服务端认证上下文，不要用前端传来的 user_id
+    result = graph.invoke(payload, config=config)
+
+    interrupts = result.get("__interrupt__") or []
+    if interrupts:
+        approval = interrupts[0].value  # 即 interrupt({...}) 传入的 JSON
+        # save_run：业务表；图状态已由 checkpointer 按 thread_id 保存
+        save_run(run_id, user_id=user.id, thread_id=thread_id,
+                 status="waiting_for_approval", approval=approval)
+        return {"run_id": run_id, "status": "waiting_for_approval", "approval": approval}
+
+    # 没有 __interrupt__：图已跑完（checkpoint 通常仍保留，不会自动删 thread_id）
+    save_run(run_id, user_id=user.id, thread_id=thread_id,
+             status="completed", state=result)
+    return {"run_id": run_id, "status": "completed", "state": result}
+
+
+def decide_run(user, run_id, decision):
+    run = load_run(run_id)
+    assert run.user_id == user.id          # 鉴权：可否审批该 run
+    assert run.status == "waiting_for_approval"
+    assert decision in ("approve", "reject")
+    # 幂等：已处理过的 decision 直接返回上次结果，不要再 resume
+
+    # 同一 thread_id → checkpointer 取出暂停时的 checkpoint，再 resume
+    config = {"configurable": {"thread_id": run.thread_id}}
+    result = graph.invoke(Command(resume=decision), config=config)
+
+    interrupts = result.get("__interrupt__") or []
+    if interrupts:
+        approval = interrupts[0].value
+        update_run(run_id, status="waiting_for_approval", approval=approval)
+        return {"run_id": run_id, "status": "waiting_for_approval", "approval": approval}
+
+    update_run(run_id, status="completed", state=result)
+    return {"run_id": run_id, "status": "completed", "state": result}
+
+
+def get_run(user, run_id):
+    run = load_run(run_id)
+    assert run.user_id == user.id
+    # 超时/刷新后前端只调这个对齐状态，不要盲目再 POST decision
+    return {
+        "run_id": run_id,
+        "status": run.status,       # waiting_for_approval | completed | ...
+        "approval": run.approval,   # 待审批时才有
+        "state": run.state,         # 完成时才有
+    }
+```
+
+流式时同样靠「有没有中断」分支，不要解析异常字符串：
+
+```python
+# 使用 stream_events(..., version="v3") 时，中断在返回的 stream 对象上：
+#   stream.interrupted  → bool
+#   stream.interrupts   → 本次 pause 的 Interrupt 列表（.value 即 interrupt({...}) 的载荷）
+# 这两个是 LangGraph 事件流 API 的字段，不是下面这种自造函数。
+
+def create_run_streaming(user, payload):
+    run_id = str(uuid4())
+    thread_id = str(uuid4())
+    config = {"configurable": {"thread_id": thread_id}}
+
+    # 同样要求 graph = builder.compile(checkpointer=...)
+    stream = graph.stream_events(payload, config=config, version="v3")
+
+    # messages 会边产生边迭代；循环结束 = 本次运行已停（跑完或 interrupt 暂停）
+    # 不是「先攒齐所有 token 再发给前端」，而是消费完本轮投影后再看 interrupted
+    for message in stream.messages:
+        for token in message.text:
+            yield {"type": "token", "text": token}
+
+    # 到这里 stream.messages 已耗尽：要么 completed，要么因 interrupt() 暂停
+    if stream.interrupted:
+        approval = stream.interrupts[0].value
+        save_run(run_id, user_id=user.id, thread_id=thread_id,
+                 status="waiting_for_approval", approval=approval)
+        yield {"type": "status", "status": "waiting_for_approval", "approval": approval}
+    else:
+        save_run(run_id, user_id=user.id, thread_id=thread_id,
+                 status="completed", state=stream.output)
+        yield {"type": "status", "status": "completed", "state": stream.output}
+```
+
+#### 前端：用代码决定渲染流式区还是审批组件
+
+```ts
+// 伪代码：只认后端显式 status / 事件类型，不要猜「是不是还要调工具」
+
+type RunResponse = {
+  run_id: string
+  status: "waiting_for_approval" | "completed"
+  approval?: { action: string; to: string; content: string; allowed_decisions: string[] }
+  state?: unknown
+}
+
+function renderByStatus(res: RunResponse) {
+  if (res.status === "waiting_for_approval") {
+    hideStreamingCursor()
+    // 审批 UI 的数据必须来自 res.approval，不要前端自己编一份
+    showApprovalPanel(res.approval!)
+    return
+  }
+  if (res.status === "completed") {
+    hideApprovalPanel()
+    showFinalResult(res.state)
+  }
+}
+
+// 非流式：一次 POST 到底
+async function startRun(payload: unknown) {
+  const res = await postJSON<RunResponse>("/runs", payload)
+  renderByStatus(res)
+}
+
+// 先流式、后审批：同一条事件流里切换 UI
+// msg.type 不是框架自带字段，而是后端 SSE 按约定推送的信封，例如前面 create_run_streaming 里：
+//   yield {"type": "token", "text": ...}
+//   yield {"type": "status", "status": "waiting_for_approval" | "completed", ...}
+async function startRunStreaming(payload: unknown) {
+  for await (const msg of openEventStream("/runs/stream", payload)) {
+    if (msg.type === "token") {
+      appendStreamingText(msg.text)          // 渲染流式输出
+      continue
+    }
+    if (msg.type === "status" && msg.status === "waiting_for_approval") {
+      hideStreamingCursor()
+      showApprovalPanel(msg.approval)        // 切换审批组件
+      continue
+    }
+    if (msg.type === "status" && msg.status === "completed") {
+      hideApprovalPanel()
+      showFinalResult(msg.state)
+    }
+  }
+}
+
+async function submitDecision(runId: string, decision: "approve" | "reject") {
+  const res = await postJSON<RunResponse>(`/runs/${runId}/decision`, { decision })
+  renderByStatus(res)
+}
+
+async function recoverAfterTimeout(runId: string) {
+  // 不确定时只 GET，禁止直接再点批准
+  const res = await getJSON<RunResponse>(`/runs/${runId}`)
+  renderByStatus(res)
+}
+```
+
+对接时还要注意：
+
+- 不要信任前端传来的 `user_id` 或任意 `thread_id`，必须与服务端身份和授权绑定。
+- 上例 `interrupt({...})` 里的 `action`、`allowed_decisions` 是**本教程自定义的业务字段**，不是 `HumanInTheLoopMiddleware` 的固定协议；两套格式不要混用。
+- 用 `graph.invoke()` 时，中断出现在返回值的 `__interrupt__`；用 `stream_events(..., version="v3")` 时看 `stream.interrupted` / `stream.interrupts`，不要靠匹配异常字符串判断是否中断。
 
 ### 4.3 原生 HITL 中间件与手写中断
 
@@ -301,6 +492,10 @@ assert multiply_tool.invoke({"a": 4, "b": 7}) == 28
 from typing import Type
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
+from langchain_core.callbacks import (
+    AsyncCallbackManagerForToolRun,
+    CallbackManagerForToolRun,
+)
 
 class MultiplyInput(BaseModel):
     a: int = Field(description="第一个乘数")
@@ -311,14 +506,43 @@ class MultiplyTool(BaseTool):
     description: str = "计算两个整数的乘积"
     args_schema: Type[BaseModel] = MultiplyInput
 
-    def _run(self, a: int, b: int) -> int:
+    # --- 必须：同步实现。tool.invoke(...) / tool.run(...) 最终进这里 ---
+    def _run(
+        self,
+        a: int,
+        b: int,
+        run_manager: CallbackManagerForToolRun | None = None,
+    ) -> int:
+        # run_manager 可选：需要时向上抛进度/日志；多数业务工具可忽略
         return a * b
+
+    # --- 可选：原生异步。tool.ainvoke(...) / await tool.arun(...) 优先进这里 ---
+    # 不重写时，框架默认：await run_in_executor(None, self._run, ...)
+    # 即把上面的 _run 丢进线程池，事件循环不堵，但并不是真异步 I/O
+    async def _arun(
+        self,
+        a: int,
+        b: int,
+        run_manager: AsyncCallbackManagerForToolRun | None = None,
+    ) -> int:
+        # 有 AsyncClient / 异步 DB 时在这里 await；本例无 I/O，直接算即可
+        return a * b
+
+    # --- 一般不要为了写业务去重写这些对外入口 ---
+    # 它们负责：参数校验 / args_schema、回调与 tracing、错误处理策略、再转到 _run/_arun。
+    # 业务写进 invoke/run 会绕开上述封装，Agent、中间件、可观测性也容易对不上。
+    # 工具逻辑只放 _run / _arun；需要改调用行为时用属性（如 handle_tool_error）或中间件。
+    # def invoke(self, input, config=None, **kwargs): ...
+    # async def ainvoke(self, input, config=None, **kwargs): ...
+    # def run(self, tool_input, ...): ...
+    # async def arun(self, tool_input, ...): ...
 
 tool_instance = MultiplyTool()
 assert tool_instance.invoke({"a": 6, "b": 8}) == 48
+# assert await tool_instance.ainvoke({"a": 6, "b": 8}) == 48  # 在 async 函数里调用
 ```
 
-对有副作用的工具（邮件、转账、删除、改库）还应在**工具执行层**检查权限、校验参数、记录审计并防止重复执行；模型生成了合法 schema，不等于可以执行。参见 [工具文档](https://docs.langchain.com/oss/python/langchain/tools)。
+对有副作用的工具（邮件、转账、删除、改库）还应在**工具执行层**（`_run` / `_arun` 内）检查权限、校验参数、记录审计并防止重复执行；模型生成了合法 schema，不等于可以执行。参见 [工具文档](https://docs.langchain.com/oss/python/langchain/tools)。
 
 ## 六、从教学代码到生产系统
 
