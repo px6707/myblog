@@ -1,0 +1,10 @@
+{
+  "python_version": "3.12",
+  "graphs": {
+    "hitl_interrupt_forms": "./agents/hitl_interrupt_forms.py:agent"
+  },
+  "env": ".env",
+  "dependencies": [
+    "."
+  ]
+}

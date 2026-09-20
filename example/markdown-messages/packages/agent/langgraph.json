@@ -1,0 +1,10 @@
+{
+  "python_version": "3.12",
+  "graphs": {
+    "simple_agent": "./agents/simple_agent.py:agent"
+  },
+  "env": ".env",
+  "dependencies": [
+    "."
+  ]
+}

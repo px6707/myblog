@@ -1,0 +1,10 @@
+{
+  "python_version": "3.12",
+  "graphs": {
+    "tool_calling": "./agents/tool_calling.py:agent"
+  },
+  "env": ".env",
+  "dependencies": [
+    "."
+  ]
+}

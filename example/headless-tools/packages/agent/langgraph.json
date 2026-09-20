@@ -1,0 +1,10 @@
+{
+  "python_version": "3.12",
+  "graphs": {
+    "headless_tools": "./agents/headless_tools.py:agent"
+  },
+  "env": ".env",
+  "dependencies": [
+    "."
+  ]
+}
