@@ -1,16 +1,17 @@
-# LangChain 前端模式示例
+# 示例项目
 
-这些项目是从 LangChain 文档演示区的 **Download project** 按钮下载的 Vue 前端 + Python Agent 示例，彼此独立，也不依赖博客项目的 `package.json`。
+以下五个 LangChain 项目是从 LangChain 文档演示区的 **Download project** 按钮下载的 Vue 前端 + Python Agent 示例，彼此独立，也不依赖博客项目的 `package.json`。
 
-| 项目 | 官方文档 |
+| 项目 | 说明或文档 |
 | --- | --- |
 | [markdown-messages](./markdown-messages/) | [Markdown messages](https://docs.langchain.com/oss/python/langchain/frontend/markdown-messages) |
 | [tool-calling](./tool-calling/) | [Tool calling](https://docs.langchain.com/oss/python/langchain/frontend/tool-calling) |
 | [headless-tools](./headless-tools/) | [Headless tools](https://docs.langchain.com/oss/python/langchain/frontend/headless-tools) |
 | [human-in-the-loop](./human-in-the-loop/) | [Human-in-the-Loop](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop) |
 | [hitl-interrupt-forms](./hitl-interrupt-forms/) | [Human-in-the-Loop 的表单演示](https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop) |
+| [digital-screen-adaptation](./digital-screen-adaptation/) | [适配实现](../src/contents/posts/前端/数字化大屏适配：从画布缩放到图表响应.md)和[方案选型](../src/contents/posts/前端/数字化大屏适配方案选型：固定画布、响应式与混合布局.md)的 Vue + ECharts 配套示例 |
 
-## 独立运行
+## LangChain 项目独立运行
 
 任选一个项目，进入其目录后执行：
 
